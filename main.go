@@ -14,11 +14,9 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	e.GET("/hello", handler.MainPage())
-
-	Post := handler.Init(db)
-	e.POST("/save", Post.User)
-	e.POST("/get", Post.GetUser)
+	Handler := handler.Init(db)
+	e.POST("/save", Handler.CreateUser)
+	e.POST("/get", Handler.GetUser)
 
 	e.Start(":1323")
 }

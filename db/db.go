@@ -5,7 +5,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type Product struct {
+type User struct {
 	gorm.Model
 	Name     string
 	Password string
@@ -16,6 +16,6 @@ func GormConnect() *gorm.DB {
 	if err != nil {
 		panic("failed to connect database")
 	}
-	db.AutoMigrate(&Product{})
+	db.AutoMigrate(&User{})
 	return db
 }
