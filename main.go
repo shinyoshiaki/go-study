@@ -1,20 +1,23 @@
 package main
 
 import (
-	"./db"
+	"./database"
 	"./handler"
+	"./websocket"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
 
 func main() {
 	e := echo.New()
-	db := db.GormConnect()
+	db := database.GormConnect()
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(middleware.CORS())
 
 	Handler := handler.Init(db)
+	e.GET("/ws", websocket.WebsocketConnect)
 	e.POST("/users", Handler.CreateUser)
 	e.GET("/users/:name", Handler.GetUser)
 	e.PUT("/users/:name", Handler.UpdateUser)

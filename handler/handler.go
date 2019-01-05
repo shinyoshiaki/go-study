@@ -1,12 +1,23 @@
 package handler
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 )
+
+type User struct {
+	gorm.Model
+	Name     string
+	Password string
+	Key      int
+	Code     string
+}
 
 type Handler struct {
 	db *gorm.DB
@@ -21,12 +32,6 @@ type GetUser struct {
 	Name string `json:"name" form:"name" query:"name"`
 }
 
-type User struct {
-	gorm.Model
-	Name     string
-	Password string
-}
-
 func Init(db *gorm.DB) Handler {
 	return Handler{db: db}
 }
@@ -38,8 +43,21 @@ func (this Handler) CreateUser(c echo.Context) (err error) {
 		return
 	}
 
-	this.db.Create(&User{Name: u.Name, Password: u.Password})
-	return c.JSON(http.StatusOK, u)
+	var user User
+	this.db.Find(&user, "Name = ?", u.Name)
+
+	count := this.userNum()
+
+	encoder := sha1.New()
+	encoder.Write([]byte(strconv.Itoa(count)))
+	hash := encoder.Sum(nil)
+	hexHash := hex.EncodeToString(hash)
+
+	if user.Name == "" {
+		this.db.Create(&User{Name: u.Name, Password: u.Password, Key: count, Code: hexHash})
+		return c.JSON(http.StatusOK, u)
+	}
+	return c.JSON(http.StatusBadRequest, u)
 }
 
 func (this Handler) GetUser(c echo.Context) (err error) {
@@ -49,7 +67,7 @@ func (this Handler) GetUser(c echo.Context) (err error) {
 
 	fmt.Println(user.Name + ":" + user.Password)
 
-	return c.String(http.StatusOK, fmt.Sprintln(user.Password))
+	return c.JSON(http.StatusOK, user)
 }
 
 func (this Handler) UpdateUser(c echo.Context) (err error) {
@@ -77,4 +95,16 @@ func (this Handler) DeleteUser(c echo.Context) (err error) {
 	this.db.First(&u, "Name = ?", name)
 	this.db.Delete(&u)
 	return c.JSON(http.StatusOK, u)
+}
+
+func (this Handler) userNum() int {
+	count := 0
+	var u []User
+	this.db.Find(&u).Count(&count)
+	return count
+}
+
+func (this Handler) GetUserNum(c echo.Context) (err error) {
+	count := this.userNum()
+	return c.String(http.StatusOK, fmt.Sprintln(count))
 }
