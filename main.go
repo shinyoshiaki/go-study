@@ -1,28 +1,31 @@
 package main
 
 import (
-	"echo-pg/database"
-	"echo-pg/handler"
+	"echo-pg/handler/user/login"
+	"echo-pg/handler/user/signup"
 	"echo-pg/websocket"
 
+	"github.com/ipfans/echo-session"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
 
 func main() {
 	e := echo.New()
-	db := database.GormConnect()
+
+	store := session.NewCookieStore([]byte("secret-key"))
+	store.MaxAge(86400)
+	e.Use(session.Sessions("ESESSION", store))
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 
-	Handler := handler.Init(db)
 	e.GET("/ws", websocket.WebsocketConnect)
-	e.POST("/users", Handler.CreateUser)
-	e.GET("/users/:name", Handler.GetUser)
-	e.PUT("/users/:name", Handler.UpdateUser)
-	e.DELETE("/users/:name", Handler.DeleteUser)
+	e.GET("/users/signup", signup.SignUp)
+	e.GET("/users/login", login.Login)
+	// e.PUT("/users/:name", Handler.UpdateUser)
+	// e.DELETE("/users/:name", Handler.DeleteUser)
 	e.Start(":1323")
 }
 

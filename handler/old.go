@@ -1,4 +1,4 @@
-package handler
+package old
 
 import (
 	"crypto/sha1"
@@ -7,34 +7,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 )
-
-type User struct {
-	gorm.Model
-	Name     string
-	Password string
-	Key      int
-	Code     string
-}
-
-type Handler struct {
-	db *gorm.DB
-}
-
-type UserJson struct {
-	Name     string `json:"name" form:"name" query:"name"`
-	Password string `json:"password" form:"password" query:"password"`
-}
-
-type GetUser struct {
-	Name string `json:"name" form:"name" query:"name"`
-}
-
-func Init(db *gorm.DB) Handler {
-	return Handler{db: db}
-}
 
 func (this Handler) CreateUser(c echo.Context) (err error) {
 	u := new(UserJson)
