@@ -55,9 +55,15 @@ func (this Handler) CreateUser(c echo.Context) (err error) {
 
 	if user.Name == "" {
 		this.db.Create(&User{Name: u.Name, Password: u.Password, Key: count, Code: hexHash})
-		return c.JSON(http.StatusOK, u)
+		var result struct {
+			Name string `json:"name"`
+			Code string `json:"id"`
+		}
+		result.Name = u.Name
+		result.Code = hexHash
+		return c.JSON(http.StatusOK, result)
 	}
-	return c.JSON(http.StatusBadRequest, u)
+	return c.String(http.StatusBadRequest, "fail")
 }
 
 func (this Handler) GetUser(c echo.Context) (err error) {
@@ -75,7 +81,9 @@ func (this Handler) UpdateUser(c echo.Context) (err error) {
 	var prev User
 	this.db.First(&prev, "Name = ?", name)
 
-	fmt.Println(prev.Name + ":" + prev.Password)
+	if prev.Name == "" {
+		return c.String(http.StatusBadRequest, "fail")
+	}
 
 	next := new(UserJson)
 	if err = c.Bind(next); err != nil {

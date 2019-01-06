@@ -1,9 +1,10 @@
 package main
 
 import (
-	"./database"
-	"./handler"
-	"./websocket"
+	"echo-pg/database"
+	"echo-pg/handler"
+	"echo-pg/websocket"
+
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
