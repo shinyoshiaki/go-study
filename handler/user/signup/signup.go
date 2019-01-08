@@ -1,9 +1,11 @@
 package signup
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
+	"echo-pg/handler/user/login"
 	"echo-pg/model/user"
 	"echo-pg/utill/hash"
 
@@ -22,18 +24,20 @@ func SignUp(c echo.Context) (err error) {
 		Password string `json:"password"`
 	}
 
-	if err = c.Bind(json); err != nil {
+	if err = c.Bind(&json); err != nil {
 		return
 	}
 
 	if json.Name == "" || json.Password == "" {
-		return c.String(http.StatusBadRequest, "null")
+		fmt.Println("null")
+		return c.String(http.StatusBadRequest, fmt.Sprintln("null"))
 	}
 
 	var u user.User
 	db.Find(&u, "Name = ?", json.Name)
 
 	if u.Name == "" {
+		fmt.Println("un exist")
 		count := 0
 		var users []user.User
 		db.Find(&users).Count(count)
@@ -48,7 +52,11 @@ func SignUp(c echo.Context) (err error) {
 		}
 		result.Name = json.Name
 		result.Code = code
+
+		login.WriteCookie(c, code)
+
 		return c.JSON(http.StatusOK, result)
 	}
+	fmt.Println("exist")
 	return c.String(http.StatusBadRequest, "exist")
 }

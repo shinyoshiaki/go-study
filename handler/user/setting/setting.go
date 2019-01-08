@@ -1,0 +1,55 @@
+package setting
+
+import (
+	"net/http"
+
+	"echo-pg/handler/user/login"
+	"echo-pg/model/user"
+	"echo-pg/utill/hash"
+
+	"github.com/labstack/echo"
+)
+
+var (
+	db = user.Connect()
+)
+
+func Update(c echo.Context) (err error) {
+
+	var json struct {
+		Code     string `json:"code"`
+		Name     string `json:"name"`
+		Password string `json:"password"`
+		Session  string `json:"session"`
+	}
+
+	if err = c.Bind(json); err != nil {
+		return
+	}
+
+	if login.IsLogin(c, json.Code, json.Session) == false {
+		return c.String(http.StatusBadRequest, "not login")
+	}
+
+	if json.Name == "" || json.Password == "" {
+		return c.String(http.StatusBadRequest, "null")
+	}
+
+	var prev user.User
+	db.Find(&prev, "Name = ?", json.Name)
+
+	if prev.Name == "" {
+		return c.String(http.StatusBadRequest, "unexist hacked?")
+	}
+
+	pass := hash.Sha1(json.Password)
+	next := &user.User{Name: json.Name, Password: pass, Key: prev.Key, Code: prev.Code}
+	db.Model(&prev).Update(next)
+
+	var result struct {
+		Name string `json:"name"`
+	}
+	result.Name = json.Name
+
+	return c.JSON(http.StatusOK, result)
+}

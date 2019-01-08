@@ -1,7 +1,11 @@
 package login
 
 import (
+	"fmt"
+	"math/rand"
 	"net/http"
+	"strconv"
+	"time"
 
 	"echo-pg/model/user"
 	"echo-pg/utill/hash"
@@ -22,11 +26,13 @@ func Login(c echo.Context) (err error) {
 		Password string `json:"password"`
 	}
 
-	if err = c.Bind(json); err != nil {
+	if err = c.Bind(&json); err != nil {
+		fmt.Println("json error")
 		return
 	}
 
 	if json.Name == "" || json.Password == "" {
+		fmt.Println("null")
 		return c.String(http.StatusBadRequest, "null")
 	}
 
@@ -34,31 +40,52 @@ func Login(c echo.Context) (err error) {
 	db.Find(&u, "Name = ?", json.Name)
 
 	if u.Name == "" {
+		fmt.Println("unexist")
 		return c.String(http.StatusBadRequest, "unexist")
 	}
 
 	if hash.Sha1(json.Password) == u.Password {
-		session := session.Default(c)
-		session.Set("loginCompleted", "completed")
-		session.Save()
+		sessionKey := WriteCookie(c, u.Code)
 
 		var result struct {
-			Name string `json:"name"`
-			Code string `json:"id"`
+			Name    string `json:"name"`
+			Code    string `json:"id"`
+			Session string `json:"session"`
 		}
 		result.Name = u.Name
 		result.Code = u.Code
+		result.Session = sessionKey
+
+		fmt.Println("login ok:" + u.Name)
 		return c.JSON(http.StatusOK, result)
 	}
+	fmt.Println("wrong pass")
 	return c.String(http.StatusBadRequest, "wrong pass")
 }
 
-// IsLogin .
-func IsLogin(c echo.Context) bool {
+func WriteCookie(c echo.Context, Code string) string {
 	session := session.Default(c)
+	rand.Seed(time.Now().UnixNano())
+	sessionKey := hash.Sha1(strconv.Itoa(rand.Int()))
+	session.Set(Code, sessionKey)
+	session.Save()
 
-	login := session.Get("loginCompleted")
-	if login != nil && login == "completed" {
+	cookie := new(http.Cookie)
+	cookie.Name = "session"
+	cookie.Value = sessionKey
+	cookie.Expires = time.Now().Add(24 * time.Hour)
+	cookie.Path = "/"
+	c.SetCookie(cookie)
+
+	return sessionKey
+}
+
+// IsLogin .
+func IsLogin(c echo.Context, code string, key string) bool {
+	session := session.Default(c)
+	sessionKey := session.Get(code)
+
+	if sessionKey == key {
 		return true
 	}
 	return false
