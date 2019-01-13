@@ -9,6 +9,7 @@ import (
 	"echo-pg/utill/hash"
 
 	"github.com/labstack/echo"
+	"github.com/labstack/echo-contrib/session"
 )
 
 var (
@@ -16,6 +17,8 @@ var (
 )
 
 func Update(c echo.Context) (err error) {
+	sess, _ := session.Get("session", c)
+	fmt.Println("test", sess.Values["test"])
 
 	var json struct {
 		Code     string `json:"code"`
@@ -49,8 +52,10 @@ func Update(c echo.Context) (err error) {
 
 	var result struct {
 		Name string `json:"name"`
+		Code string `json:"id"`
 	}
 	result.Name = json.Name
+	result.Code = json.Code
 
 	return c.JSON(http.StatusOK, result)
 }

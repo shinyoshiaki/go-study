@@ -6,7 +6,6 @@ import (
 	"echo-pg/handler/user/signup"
 
 	"github.com/gorilla/sessions"
-	"github.com/ipfans/echo-session"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/middleware"
@@ -14,10 +13,14 @@ import (
 
 func main() {
 	e := echo.New()
-	e.Use(session.Middleware(sessions.NewCookieStore([]byte("secret"))))
-
-	// maxAge := 24 * 60 * 60
-	maxAge := 60 * 10
+	store := sessions.NewCookieStore([]byte("secret"))
+	store.Options = &sessions.Options{
+		Domain:   "localhost",
+		Path:     "/",
+		MaxAge:   3600 * 8, // 8 hours
+		HttpOnly: true,
+	}
+	e.Use(session.Middleware(store))
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())

@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"echo-pg/model/user"
+	"echo-pg/session"
 	"echo-pg/utill/hash"
 
-	"github.com/ipfans/echo-session"
 	"github.com/labstack/echo"
 )
 
@@ -64,21 +64,17 @@ func Login(c echo.Context) (err error) {
 }
 
 func WriteCookie(c echo.Context, code string) string {
-	session := session.Default(c)
 	rand.Seed(time.Now().UnixNano())
 	sessionKey := hash.Sha1(strconv.Itoa(rand.Int()))
 	session.Set(code, sessionKey)
-	session.Save()
 
 	return sessionKey
 }
 
 // IsLogin .
 func IsLogin(c echo.Context, code string, key string) bool {
-	session := session.Default(c)
-	sessionKey := session.Get(code).(string)
-
-	fmt.Println("islogin:" + sessionKey + "," + key)
+	sessionKey := session.Get(code)
+	fmt.Println("islogin:", sessionKey, key)
 
 	if sessionKey == key {
 		return true
