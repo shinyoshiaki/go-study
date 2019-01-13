@@ -63,19 +63,12 @@ func Login(c echo.Context) (err error) {
 	return c.String(http.StatusBadRequest, "wrong pass")
 }
 
-func WriteCookie(c echo.Context, Code string) string {
+func WriteCookie(c echo.Context, code string) string {
 	session := session.Default(c)
 	rand.Seed(time.Now().UnixNano())
 	sessionKey := hash.Sha1(strconv.Itoa(rand.Int()))
-	session.Set(Code, sessionKey)
+	session.Set(code, sessionKey)
 	session.Save()
-
-	cookie := new(http.Cookie)
-	cookie.Name = "session"
-	cookie.Value = sessionKey
-	cookie.Expires = time.Now().Add(24 * time.Hour)
-	cookie.Path = "/"
-	c.SetCookie(cookie)
 
 	return sessionKey
 }
@@ -83,7 +76,9 @@ func WriteCookie(c echo.Context, Code string) string {
 // IsLogin .
 func IsLogin(c echo.Context, code string, key string) bool {
 	session := session.Default(c)
-	sessionKey := session.Get(code)
+	sessionKey := session.Get(code).(string)
+
+	fmt.Println("islogin:" + sessionKey + "," + key)
 
 	if sessionKey == key {
 		return true

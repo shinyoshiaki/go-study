@@ -1,6 +1,7 @@
 package setting
 
 import (
+	"fmt"
 	"net/http"
 
 	"echo-pg/handler/user/login"
@@ -23,24 +24,24 @@ func Update(c echo.Context) (err error) {
 		Session  string `json:"session"`
 	}
 
-	if err = c.Bind(json); err != nil {
+	if err = c.Bind(&json); err != nil {
 		return
 	}
 
+	fmt.Println(json)
+
 	if login.IsLogin(c, json.Code, json.Session) == false {
+		fmt.Println("not login")
 		return c.String(http.StatusBadRequest, "not login")
 	}
 
 	if json.Name == "" || json.Password == "" {
+		fmt.Println("null")
 		return c.String(http.StatusBadRequest, "null")
 	}
 
 	var prev user.User
 	db.Find(&prev, "Name = ?", json.Name)
-
-	if prev.Name == "" {
-		return c.String(http.StatusBadRequest, "unexist hacked?")
-	}
 
 	pass := hash.Sha1(json.Password)
 	next := &user.User{Name: json.Name, Password: pass, Key: prev.Key, Code: prev.Code}
