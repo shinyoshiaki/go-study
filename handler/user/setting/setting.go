@@ -31,8 +31,6 @@ func Update(c echo.Context) (err error) {
 		return
 	}
 
-	fmt.Println(json)
-
 	if login.IsLogin(c, json.Code, json.Session) == false {
 		fmt.Println("not login")
 		return c.String(http.StatusBadRequest, "not login")

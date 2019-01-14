@@ -1,6 +1,7 @@
 package main
 
 import (
+	postTweet "echo-pg/handler/tweet/post"
 	"echo-pg/handler/user/login"
 	"echo-pg/handler/user/setting"
 	"echo-pg/handler/user/signup"
@@ -29,14 +30,13 @@ func main() {
 	e.POST("/users/signup", signup.SignUp)
 	e.POST("/users/login", login.Login)
 	e.POST("/users/update", setting.Update)
+	e.POST("/tweet/post", postTweet.Post)
 	// e.DELETE("/users/:name", Handler.DeleteUser)
 	e.Start(":1323")
 }
 
 /*
 curl -X POST localhost:1323/users -H 'Content-Type: application/json' -d '{"name":"update-work","password":"1234"}'
-curl localhost:1323/users/update-work
-curl -X PUT http://localhost:1323/users/update-work -H 'Content-Type: application/json' -d '{"password":"password"}'
-curl -X DELETE localhost:1323/users/update-work
 create table User(Name,Password,Key,Code);
+create table Tweet(Number,Name,Code,Time,Text,Picture);
 */
