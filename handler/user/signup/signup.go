@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"echo-pg/handler/follow/utill"
 	"echo-pg/handler/user/login"
 	"echo-pg/model/user"
 	"echo-pg/utill/hash"
@@ -54,6 +55,7 @@ func SignUp(c echo.Context) (err error) {
 		result.Code = code
 
 		login.WriteCookie(c, code)
+		utill.Init(code)
 
 		return c.JSON(http.StatusOK, result)
 	}
