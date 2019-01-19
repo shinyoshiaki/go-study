@@ -12,10 +12,12 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/middleware"
+	"golang.org/x/crypto/acme/autocert"
 )
 
 func main() {
 	e := echo.New()
+	e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("ioafjaof.mydns.jp")
 	store := sessions.NewCookieStore([]byte("secret"))
 	store.Options = &sessions.Options{
 		Domain:   "localhost",
