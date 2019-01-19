@@ -15,7 +15,7 @@ import (
 
 func main() {
 	e := echo.New()
-	e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("ioafjaof.mydns.jp")
+	e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("ioafjaof.tk")
 	e.AutoTLSManager.Cache = autocert.DirCache("/var/www/.cache")
 
 	e.Pre(middleware.HTTPSWWWRedirect())
