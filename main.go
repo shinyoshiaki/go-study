@@ -8,9 +8,7 @@ import (
 	"echo-pg/handler/user/setting"
 	"echo-pg/handler/user/signup"
 
-	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
-	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/middleware"
 	"golang.org/x/crypto/acme/autocert"
 )
@@ -18,14 +16,9 @@ import (
 func main() {
 	e := echo.New()
 	e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("ioafjaof.mydns.jp")
-	store := sessions.NewCookieStore([]byte("secret"))
-	store.Options = &sessions.Options{
-		Domain:   "localhost",
-		Path:     "/",
-		MaxAge:   3600 * 8, // 8 hours
-		HttpOnly: true,
-	}
-	e.Use(session.Middleware(store))
+	e.AutoTLSManager.Cache = autocert.DirCache("/var/www/.cache")
+
+	e.Pre(middleware.HTTPSWWWRedirect())
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
