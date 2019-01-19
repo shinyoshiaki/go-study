@@ -36,7 +36,7 @@ func main() {
 	e.POST("/tweet/get/mine", getTweet.Mine)
 	e.POST("/follow/add", addFollow.Follow)
 	// e.DELETE("/users/:name", Handler.DeleteUser)
-	e.Start(":1323")
+	e.Logger.Fatal(e.StartAutoTLS(":443"))
 }
 
 /*
