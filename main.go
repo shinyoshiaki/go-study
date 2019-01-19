@@ -10,15 +10,10 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"golang.org/x/crypto/acme/autocert"
 )
 
 func main() {
 	e := echo.New()
-	e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("echosome.tk")
-	e.AutoTLSManager.Cache = autocert.DirCache("/var/www/.cache")
-
-	e.Pre(middleware.HTTPSWWWRedirect())
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -31,7 +26,7 @@ func main() {
 	e.POST("/tweet/get/mine", getTweet.Mine)
 	e.POST("/follow/add", addFollow.Follow)
 	// e.DELETE("/users/:name", Handler.DeleteUser)
-	e.Logger.Fatal(e.StartAutoTLS(":443"))
+	e.Logger.Fatal(e.StartTLS(":443", "cert.pem", "key.pem"))
 }
 
 /*
