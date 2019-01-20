@@ -45,8 +45,8 @@ func Post(c echo.Context) (err error) {
 			count = 0
 		}
 	}
-
-	now := time.Now().String()
+	const layout = "2006/1/2 15:04:05"
+	now := time.Now().Format(layout)
 
 	db.Create(&tweet.Tweet{Number: count, Time: now, Code: json.Code, Text: json.Text})
 
@@ -59,6 +59,7 @@ func Post(c echo.Context) (err error) {
 	}
 
 	result.Number = count
+
 	result.Time = now
 	result.Name = utill.Code2Name(json.Code)
 	result.Code = json.Code

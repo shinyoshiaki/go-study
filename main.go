@@ -8,22 +8,12 @@ import (
 	"echo-pg/handler/user/setting"
 	"echo-pg/handler/user/signup"
 
-	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
-	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/middleware"
 )
 
 func main() {
 	e := echo.New()
-	store := sessions.NewCookieStore([]byte("secret"))
-	store.Options = &sessions.Options{
-		Domain:   "localhost",
-		Path:     "/",
-		MaxAge:   3600 * 8, // 8 hours
-		HttpOnly: true,
-	}
-	e.Use(session.Middleware(store))
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -34,6 +24,7 @@ func main() {
 	e.POST("/users/update", setting.Update)
 	e.POST("/tweet/post", postTweet.Post)
 	e.POST("/tweet/get/mine", getTweet.Mine)
+	e.POST("/tweet/get/search", getTweet.Search)
 	e.POST("/follow/add", addFollow.Follow)
 	// e.DELETE("/users/:name", Handler.DeleteUser)
 	e.Start(":1323")
