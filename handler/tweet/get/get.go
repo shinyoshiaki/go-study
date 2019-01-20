@@ -51,6 +51,45 @@ func Mine(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, result)
 }
 
+func User(c echo.Context) (err error) {
+	var json struct {
+		Code string `json:"code"`
+	}
+	if err = c.Bind(&json); err != nil {
+		return
+	}
+
+	tweets := []tweet.Tweet{}
+	db.Find(&tweets, "Code = ?", json.Code)
+
+	type Tweet struct {
+		Number int    `json:"number"`
+		Time   string `json:"time"`
+		Name   string `json:"name"`
+		Code   string `json:"code"`
+		Text   string `json:"text"`
+	}
+	results := make([]Tweet, 0)
+
+	for _, v := range tweets {
+		tweet := Tweet{}
+		tweet.Number = v.Number
+		tweet.Time = v.Time
+		tweet.Name = utill.Code2Name(v.Code)
+		tweet.Code = v.Code
+		tweet.Text = v.Text
+		results = append(results, tweet)
+	}
+
+	var result struct {
+		Tweets []Tweet `json:"tweets"`
+		Name   string  `json:"name"`
+	}
+	result.Tweets = results
+	result.Name = utill.Code2Name(json.Code)
+	return c.JSON(http.StatusOK, result)
+}
+
 func Search(c echo.Context) (err error) {
 	var json struct {
 		Word string `json:"word"`

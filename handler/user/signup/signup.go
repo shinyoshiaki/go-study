@@ -40,10 +40,11 @@ func SignUp(c echo.Context) (err error) {
 	if u.Name == "" {
 		fmt.Println("un exist")
 		count := 0
-		var users []user.User
-		db.Find(&users).Count(count)
+		users := []user.User{}
+		db.Find(&users).Count(&count)
 
 		code := hash.Sha1(strconv.Itoa(count))
+		fmt.Println(count, code)
 		pass := hash.Sha1(json.Password)
 
 		db.Create(&user.User{Name: json.Name, Password: pass, Key: count, Code: code})
@@ -56,7 +57,6 @@ func SignUp(c echo.Context) (err error) {
 
 		login.WriteCookie(c, code)
 		utill.Init(code)
-
 		return c.JSON(http.StatusOK, result)
 	}
 	fmt.Println("exist")
