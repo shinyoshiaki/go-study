@@ -24,6 +24,7 @@ func main() {
 	e.POST("/users/update", setting.Update)
 	e.POST("/tweet/post", postTweet.Post)
 	e.POST("/tweet/get/mine", getTweet.Mine)
+	e.POST("/tweet/get/search", getTweet.Search)
 	e.POST("/follow/add", addFollow.Follow)
 	// e.DELETE("/users/:name", Handler.DeleteUser)
 	e.Logger.Fatal(e.StartTLS(":9443", "cert.pem", "key.pem"))
