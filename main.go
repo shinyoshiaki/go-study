@@ -2,6 +2,7 @@ package main
 
 import (
 	addFollow "echo-pg/handler/follow/add"
+	getFollow "echo-pg/handler/follow/get"
 	getTweet "echo-pg/handler/tweet/get"
 	postTweet "echo-pg/handler/tweet/post"
 	"echo-pg/handler/user/login"
@@ -27,6 +28,7 @@ func main() {
 	e.POST("/tweet/get/search", getTweet.Search)
 	e.POST("/tweet/get/user", getTweet.User)
 	e.POST("/follow/add", addFollow.Follow)
+	e.POST("/follow/get", getFollow.Info)
 	// e.DELETE("/users/:name", Handler.DeleteUser)
 	e.Start(":1323")
 }
