@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo"
 
 	"echo-pg/handler/user/login"
+	"echo-pg/handler/user/utill"
 	"echo-pg/model/follow"
 	"echo-pg/utill/array"
 )
@@ -28,6 +29,10 @@ func Follow(c echo.Context) (err error) {
 
 	if login.IsLogin(c, json.Code, json.Session) == false {
 		return c.String(http.StatusBadRequest, "not login")
+	}
+
+	if utill.Code2Name(json.Code) == json.User == true {
+		return c.String(http.StatusBadRequest, "its me")
 	}
 
 	var f follow.Follow

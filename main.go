@@ -27,8 +27,8 @@ func main() {
 	e.POST("/tweet/get/mine", getTweet.Mine)
 	e.POST("/tweet/get/search", getTweet.Search)
 	e.POST("/tweet/get/user", getTweet.User)
-	e.POST("/follow/add", addFollow.Follow)
-	e.POST("/follow/get", getFollow.Info)
+	e.POST("/friend/add", addFollow.Follow)
+	e.POST("/friend/get", getFollow.Info)
 	// e.DELETE("/users/:name", Handler.DeleteUser)
 	e.Start(":1323")
 }
